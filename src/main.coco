@@ -1,0 +1,12 @@
+#!/usr/bin/env coconut-run
+
+def factorial(0) = 1
+
+addpattern def factorial(int() as n if n > 0) =
+    """Compute n! where n is an integer >= 0."""
+    range(1, n+1) |> reduce$(*)
+
+"hello, world!" |> print
+
+1234 |> factorial |> print
+
