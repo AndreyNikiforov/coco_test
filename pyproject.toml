@@ -10,7 +10,7 @@ version="0.0.1"
 name = "coco_test"
 description = "Experimenting with coconut language"
 readme = "README.md"
-requires-python = ">=3.8,<3.13"
+requires-python = ">=3.9,<3.14"
 keywords = ["coconut"]
 license = {file="LICENSE"}
 authors=[
@@ -23,24 +23,18 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
 ]
 dependencies = [
-    "coconut==3.1.1",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
+    "pyinstaller==6.15.0",
+    "coconut[mypy,jobs,watch]==3.1.2",
 ]
 test = [
     "pytest==7.4.3",
     "mock==5.1.0",
-    "freezegun==1.2.2",
-    "vcrpy==4.4.0",
-    "pytest-cov==4.1.0",
-    "ruff==0.5.0",
-    "coveralls==3.3.1",
-    "pytest-timeout==2.1.0",
-    "pytest-xdist==3.3.1",
-    "mypy==1.10.1",
-    "types-mock==5.1.0.1",
+    "ruff==0.11.13",
+    "mypy==1.17.1",
 ]
 
 [project.urls]
@@ -53,15 +47,15 @@ log_date_format = "%Y-%m-%d %H:%M:%S"
 timeout = 300
 testpaths = [
     "tests",
-    "src_py" # needed for doctests    
+    "src" # needed for doctests    
 ]
 pythonpath = [
-    "src_py"
+    "src"
 ]
 addopts = "--doctest-modules"
 
 [tool.setuptools.packages.find]
-where = ["src_py"]  # list of folders that contain the packages (["."] by default)
+where = ["src"]  # list of folders that contain the packages (["."] by default)
 
 [tool.ruff]
 line-length = 100

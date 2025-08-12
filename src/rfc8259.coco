@@ -1,0 +1,56 @@
+#!/usr/bin/env coconut-run
+
+from typing import Mapping, Sequence, Literal
+
+
+# rfc8259
+type JSON_Null = None
+type JSON_True = Literal[True]
+type JSON_False = Literal[False]
+type JSON_Number = int | float
+type JSON_String = str
+type JSON_Object[T <: JSON_Value] = Mapping[str, T]
+type JSON_Array[T <: JSON_Value] = Sequence[T]
+type JSON_Value[T <: JSON_Value] = JSON_Null | JSON_True | JSON_False | JSON_Number | JSON_String | JSON_Object[T] | JSON_Array[T]
+
+# How to do "parser combinators" for json mapping?
+# def safe_get_item[T <: JSON_Value](field: str) -> (JSON_Object[T] -> Expected[T]) =
+#     (.[field]) |> safe_call$
+
+# {"fields": "abc"} |> safe_get_item("fields") |>  print
+# ex: JSON_Object[JSON_Object[str]] = {"fields": {"res": "def"}}
+# {"fields": {"res": "def"}} |> (safe_get_item("fields") ..> fmap$(safe_get_item("res")) ..> .join()) |> print
+
+# # stricter typed defs
+# type J_value[T : (str, int, float)] = JSON_Object[T]
+# type J_fields[T <: J_value] = JSON_Object[T]
+
+# # reading value into typed value
+# safe_cast_int: Any -> Expected[int] = int$ ..> safe_call$
+# safe_cast_float: Any -> Expected[int] = float$ ..> safe_call$
+
+# safe_value = safe_get_item("value")
+# p_value_int[T]: J_value[T] -> Expected[int] = safe_value ..> fmap$(safe_cast_int) ..> .join()
+# p_fields[T]: J_fields[T] -> Expected[int] = safe_get_item("fields") ..> fmap$(p_value_int[T]) ..> .join()
+
+# def error_to_none[T](r: Expected[T]) -> Optional[T] = r |> .result_or_else(_ => None)
+
+# p_f = p_fields ..> error_to_none
+
+# {"fields": {"value": 10}} |> p_fields |> print      # 10
+# {"fields": {"value": {}}} |> p_fields |> print      # Expected(TypeError)
+# {"fields": {"value": "abc"}} |> p_fields |> print   # Expected(ValueError)
+# {"fields": {"value": None}} |> p_fields |> print    # Expected(TypeError)
+# {"fields": {"value": 11.2}} |> p_fields |> print    # 11
+# {"fieldsX": {"value": 11.2}} |> p_fields |> print   # Expected(KeyError)
+
+# {"fields": {"value": 11.2}} |> p_f |> print   # None
+
+# add_two: int -> int = x => x + 2
+# p_valid = p_f ..> fmap$(add_two) ..> .join()
+# {"fields": {"value": 11.2}} |> p_valid |> print
+
+# # should catch incorrect types at compile time
+# app_abc: str -> str = x => x + "aaa"
+# p_invalid = p_f ..> fmap$(app_abc) ..> .join()
+# {"fields": {"value": 11.2}} |> p_invalid |> print
